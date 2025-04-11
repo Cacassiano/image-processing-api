@@ -22,7 +22,7 @@ public class ImageController {
     @PostMapping(value = "/mirror", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<byte[]> mirrorEndpoint(MultipartFile image, String format) throws IOException {
         if (image == null) {
-            throw new NullPointerException("Invalid request: no image found");
+            throw new NullPointerException("Invalid request: image not found");
         }
         return service.mirrorImage(ImageIO.read(image.getInputStream()), format);
     }
@@ -30,8 +30,16 @@ public class ImageController {
     @PostMapping(value = "/scale", consumes = MediaType.MULTIPART_FORM_DATA_VALUE) 
     public ResponseEntity<byte[]> scaleImage(MultipartFile image, String format, Float scaleX, Float scaleY) throws IOException{
         if (image == null) {
-            throw new NullPointerException("Invalid request: no image found"); 
+            throw new NullPointerException("Invalid request: image not found"); 
         }
         return service.rescaleImage(ImageIO.read(image.getInputStream()), format, scaleX, scaleY);
+    }
+
+    @PostMapping(value = "/rotate", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<byte[]> rotateImage(MultipartFile image, String format, Double inclination) throws IOException {
+        if (image == null) {
+            throw new NullPointerException("Invalid request: image not found");
+        }
+        return service.rotateImage(ImageIO.read(image.getInputStream()), inclination, format);
     }
 }

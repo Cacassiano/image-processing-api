@@ -63,5 +63,25 @@ public class ImageService {
         BufferedImage newImage = operation.filter(original, null);
         return this.imagemResponseDTO(newImage, format);
     }
+
+    public ResponseEntity<byte[]> rotateImage(BufferedImage original, Double inclination, String format) throws IOException {
+        
+        int x = original.getWidth(), y = original.getHeight();
+        
+        BufferedImage temp = original;
+        if (inclination == 90 || inclination == 270) {
+            temp = new BufferedImage(y, x, original.getType());
+            temp.createGraphics().drawImage(original, null, y, x);
+        }
+
+        AffineTransform transform = new AffineTransform();
+        transform.rotate(Math.toRadians(inclination), temp.getWidth()/2, temp.getHeight()/2);
+
+        AffineTransformOp operation = new AffineTransformOp(transform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+        BufferedImage newImage = operation.filter(original, null);
+        
+
+        return this.imagemResponseDTO(newImage, format);
+    }
     
 }
