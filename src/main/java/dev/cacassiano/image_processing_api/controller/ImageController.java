@@ -42,4 +42,17 @@ public class ImageController {
         }
         return service.rotateImage(ImageIO.read(image.getInputStream()), inclination, format);
     }
+
+    @PostMapping(value = "/convert", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<byte[]> convertTypes(MultipartFile image, String destFormat) throws IOException {
+        if (image == null) {
+            throw new NullPointerException("Invalid request: image not found");
+        }
+        if (destFormat.equals("jpeg")) {
+            return service.pngToJpeg(ImageIO.read(image.getInputStream()));
+        } else {
+            return service.jpegToPng(ImageIO.read(image.getInputStream()));
+        }
+
+    }
 }
