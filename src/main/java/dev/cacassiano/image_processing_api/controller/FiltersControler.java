@@ -22,12 +22,20 @@ public class FiltersControler {
     private FiltersService service;
 
     @PostMapping(value = "/blackAndWhite", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<byte[]> filterBlaxkAndWhite(MultipartFile image, String format) throws IOException {
+    public ResponseEntity<byte[]> filterBlackAndWhite(MultipartFile image, String format) throws IOException {
         if (image == null) {
             return ResponseEntity.badRequest().build();
         }
         return service.toBlackAndWhite(ImageIO.read(image.getInputStream()), format);
     }
 
-    
+    @PostMapping(value = "/sepia" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<byte[]> filterSepia(MultipartFile image, String format) throws IOException {
+        if (image == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return service.toSepia(ImageIO.read(image.getInputStream()), format);
+    }
+
 }

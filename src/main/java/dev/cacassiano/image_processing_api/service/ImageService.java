@@ -43,7 +43,6 @@ public class ImageService extends ResponseEntityImage{
     public ResponseEntity<byte[]> rotateImage(BufferedImage original, Double inclination, String format) throws IOException {
         
         int x = original.getWidth(), y = original.getHeight();
-        System.out.println(original.getType());
         BufferedImage temp = original;
         if (inclination == 90 || inclination == 270) {
             temp = new BufferedImage(y, x, original.getType());

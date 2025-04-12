@@ -27,5 +27,27 @@ public class FiltersService extends ResponseEntityImage{
 
         return this.imagemResponseDTO(image, format);
     }
+
+    public ResponseEntity<byte[]> toSepia(BufferedImage image, String format) throws IOException {
+        int maxX = image.getWidth(), maxY = image.getHeight();
+        final int maxRGB = 255, redIntensity  =60;
+        
+        for(int i = 0; i<maxY;i++) {
+            for (int j=0; j<maxX;j++){
+                int rgbOriginal = image.getRGB(j,i);
+                Color color = new Color(rgbOriginal);
+
+                int avg = (color.getRed() + color.getBlue() + color.getGreen())/3;
+                int blue = avg;
+                int red = Math.min(avg+redIntensity, maxRGB);
+                int green = Math.min(avg+redIntensity/3, maxRGB);
+
+                color = new Color(red,green, blue);
+                image.setRGB(j,i, color.getRGB());
+            }
+        }
+
+        return this.imagemResponseDTO(image, format);
+    }
     
 }
