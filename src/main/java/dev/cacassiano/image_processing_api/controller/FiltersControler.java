@@ -37,5 +37,14 @@ public class FiltersControler {
 
         return service.toSepia(ImageIO.read(image.getInputStream()), format);
     }
+    /*  Codigo de servico esta defeituoso 
 
+        @PostMapping(value = "/blur", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+        public ResponseEntity<byte[]> filterBlur(MultipartFile image, String format) throws IOException{
+            if (image == null) {
+                return ResponseEntity.badRequest().build();
+            }
+            return service.toBlur(ImageIO.read(image.getInputStream()), format);
+        }
+    */
 }

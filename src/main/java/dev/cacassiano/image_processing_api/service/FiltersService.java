@@ -49,5 +49,28 @@ public class FiltersService extends ResponseEntityImage{
 
         return this.imagemResponseDTO(image, format);
     }
+    /* codigo defeituoso
+        public ResponseEntity<byte[]> toBlur(BufferedImage image, String format) throws IOException {
+            final int x = image.getWidth(), y = image.getHeight();
+            Integer currentRGB = null;
+            int same = 0;
+            for (int i = 0; i<y; i++) {
+                for (int j = 0; j<x;j++) {
+                    if (currentRGB == null || same >= y/10) {
+                        same = 0;
+                        currentRGB = image.getRGB(j, i);
+                        image.setRGB(j, i, currentRGB);
+                        same++;
+                    } else {
+                        image.setRGB(j,i, currentRGB);
+                        same++;
+                    }
+                }
+
+            }
+    
+          return this.imagemResponseDTO(image, format);
+        }
+    */
     
 }
