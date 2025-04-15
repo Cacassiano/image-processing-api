@@ -20,6 +20,8 @@ public class SpringSecuriryConfigs {
 
     @Autowired
     SecurityFilter securityFilter;
+    
+    @SuppressWarnings("unused")
     @Autowired
     private CustomUserDetailsService userDetails;
 

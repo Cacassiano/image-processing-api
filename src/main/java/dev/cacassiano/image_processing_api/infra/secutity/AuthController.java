@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import dev.cacassiano.image_processing_api.entity.User;
+import dev.cacassiano.image_processing_api.infra.secutity.dto.LoginDTO;
 import dev.cacassiano.image_processing_api.infra.secutity.dto.RegisterDTO;
 import dev.cacassiano.image_processing_api.infra.secutity.dto.TokenDTO;
 import dev.cacassiano.image_processing_api.repository.UserRepository;
@@ -25,10 +26,10 @@ public class AuthController {
     @Autowired
     private TokenService tkService;
     @PostMapping("/login")
-    public ResponseEntity<TokenDTO > loginUser(@RequestBody String email, @RequestBody String password) {
-        User user = repository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-        if (encoder.matches(user.getPassword(), password)) {
-            String token = tkService.createToken(email);
+    public ResponseEntity<TokenDTO > loginUser(@RequestBody LoginDTO login) {
+        User user = repository.findByEmail(login.email()).orElseThrow(() -> new RuntimeException("User not found"));
+        if (encoder.matches(login.password(), user.getPassword())) {
+            String token = tkService.createToken(user.getEmail());
             return ResponseEntity.ok().body(new TokenDTO(token));
         }
         return ResponseEntity.notFound().build();

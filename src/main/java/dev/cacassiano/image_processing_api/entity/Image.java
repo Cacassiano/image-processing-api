@@ -16,6 +16,14 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 public class Image {
+
+    public Image(byte[] byteImage ,String format, String title , String dono) {
+        this.dono = dono;
+        this.image = byteImage;
+        this.title = title;
+        this.format = format;
+    }
+
     @Id @GeneratedValue(strategy = GenerationType.UUID) @Column(unique = true, nullable = false)
     String id;
 
@@ -24,5 +32,10 @@ public class Image {
 
     @Column(nullable = false)
     String dono;
+
+    String title;
+
+    @Column(nullable = false)
+    String format;
 
 }

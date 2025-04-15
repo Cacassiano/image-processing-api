@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import dev.cacassiano.image_processing_api.service.FiltersService;
 
 @RestController
-@RequestMapping("/filter")
+@RequestMapping("/image/filter")
 public class FiltersControler {
 
     @Autowired

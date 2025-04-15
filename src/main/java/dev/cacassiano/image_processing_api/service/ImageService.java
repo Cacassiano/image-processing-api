@@ -70,7 +70,7 @@ public class ImageService extends ResponseEntityImage{
 
     public ResponseEntity<byte[]> jpegToPng(BufferedImage original) throws IOException {
         BufferedImage temp = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
-        temp.createGraphics().drawImage(original,0,0,new Color(Color.TRANSLUCENT),null);
+        temp.createGraphics().drawImage(original,0,0,new Color(0,0,0,0),null);
         return this.imagemResponseDTO(temp, "png");
     }
     
