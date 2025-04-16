@@ -10,7 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 
-public abstract class ResponseEntityImage {
+public abstract class ImageConversion {
     
     private byte[] imageToByteArray(BufferedImage image, String format) throws IOException {
         ByteArrayOutputStream storage = new ByteArrayOutputStream();

@@ -6,11 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import dev.cacassiano.image_processing_api.entity.Image;
+import dev.cacassiano.image_processing_api.dto.ImageResponseDTO;
+import dev.cacassiano.image_processing_api.entity.ImageEntity;
 import dev.cacassiano.image_processing_api.repository.ImageRepository;
 
 @Service
@@ -20,7 +19,7 @@ public class DBService {
     private ImageRepository repository;
  
     public String saveNewImage(String format, String title, String dono, InputStream image) throws IOException {
-        Image newImage = new Image(image.readAllBytes() ,format,title, dono);
+        ImageEntity newImage = new ImageEntity(image.readAllBytes() ,format,title, dono);
         try {
             repository.save(newImage);
             return "saved";    
@@ -29,22 +28,24 @@ public class DBService {
         } 
     }
 
-    public List<ResponseEntity<byte[]>> getAllImages() {
-        List<Image> images = repository.findAll();
-        List<ResponseEntity<byte[]>> myImages= new ArrayList<>();
-        for(int i = 0; i<images.size(); i++) {
-            if (images.get(i).getFormat() == "png") {
-                myImages.add( ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_TYPE, "image/png")
-                        .body(images.get(i).getImage())
-                    );
-                } else {
-                myImages.add(ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_TYPE, "image/jpeg")
-                        .body(images.get(i).getImage())
-                );
+    public List<ImageResponseDTO> getAllImages(String dono) {
+        List<ImageEntity> images = repository.findAll();
+        List<ImageResponseDTO> myImages= new ArrayList<>();
+        images.forEach((ImageEntity) -> {
+            if(ImageEntity.getDono().equals(dono)) {
+                myImages.add(new ImageResponseDTO(ImageEntity));
             }
-        }
+        } );
+
         return myImages;
+    }
+
+    public boolean deleteImageById(String id, String dono) {
+        ImageEntity image = repository.getReferenceById(id);
+        if (image == null || !image.getDono().equals(dono)) {
+            return false;
+        }
+        repository.delete(image);
+        return true;
     }
 }

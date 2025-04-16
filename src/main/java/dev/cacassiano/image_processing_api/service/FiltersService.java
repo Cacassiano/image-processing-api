@@ -7,10 +7,10 @@ import java.io.IOException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import dev.cacassiano.image_processing_api.dto.ResponseEntityImage;
+import dev.cacassiano.image_processing_api.dto.ImageConversion;
 
 @Service
-public class FiltersService extends ResponseEntityImage{
+public class FiltersService extends ImageConversion{
 
     public ResponseEntity<byte[]> toBlackAndWhite(BufferedImage image, String format) throws IOException {
         

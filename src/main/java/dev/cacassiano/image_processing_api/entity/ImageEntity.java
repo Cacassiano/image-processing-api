@@ -15,9 +15,9 @@ import lombok.Setter;
 @Setter
 @Getter
 @NoArgsConstructor
-public class Image {
+public class ImageEntity {
 
-    public Image(byte[] byteImage ,String format, String title , String dono) {
+    public ImageEntity(byte[] byteImage ,String format, String title , String dono) {
         this.dono = dono;
         this.image = byteImage;
         this.title = title;

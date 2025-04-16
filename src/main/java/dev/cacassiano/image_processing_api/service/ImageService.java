@@ -9,10 +9,10 @@ import java.io.IOException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import dev.cacassiano.image_processing_api.dto.ResponseEntityImage;
+import dev.cacassiano.image_processing_api.dto.ImageConversion;
 
 @Service
-public class ImageService extends ResponseEntityImage{
+public class ImageService extends ImageConversion{
 
     public ResponseEntity<byte[]> mirrorImage(BufferedImage originalIOImage, String format) throws IOException {
         
@@ -44,7 +44,10 @@ public class ImageService extends ResponseEntityImage{
         
         int x = original.getWidth(), y = original.getHeight();
         BufferedImage temp = original;
-        if (inclination == 90 || inclination == 270) {
+        if( inclination == 270) {
+            inclination = -90.0;
+        }
+        if (inclination == 90 || inclination == -90) {
             temp = new BufferedImage(y, x, original.getType());
             temp.createGraphics().drawImage(original, null, y, x);
         }
