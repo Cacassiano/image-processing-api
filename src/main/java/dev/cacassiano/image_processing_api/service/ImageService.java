@@ -62,19 +62,18 @@ public class ImageService extends ImageConversion{
         return this.imagemResponseDTO(newImage, format);
     }
 
-    public ResponseEntity<byte[]> pngToJpeg(BufferedImage original) throws IOException {
-        
+    public byte[] pngToJpeg(BufferedImage original) throws IOException {
         BufferedImage temp = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
         temp.createGraphics().drawImage(original,0,0,Color.WHITE,null);
-        
-        
-        return this.imagemResponseDTO(temp, "jpeg");
+        ResponseEntity<byte[]> conversed = this.imagemResponseDTO(temp, "jpeg");
+        return conversed.getBody();
     }
 
-    public ResponseEntity<byte[]> jpegToPng(BufferedImage original) throws IOException {
+    public byte[] jpegToPng(BufferedImage original) throws IOException {
         BufferedImage temp = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
         temp.createGraphics().drawImage(original,0,0,new Color(0,0,0,0),null);
-        return this.imagemResponseDTO(temp, "png");
+        ResponseEntity<byte[]> conversed = this.imagemResponseDTO(temp, "png");
+        return conversed.getBody();
     }
     
 }

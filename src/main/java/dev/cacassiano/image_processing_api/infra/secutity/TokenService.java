@@ -23,7 +23,7 @@ public class TokenService {
             String token = JWT.create()
                             .withIssuer(issuer)
                             .withSubject(email)
-                            .withExpiresAt(OffsetDateTime.now().plusMinutes(15).toInstant())
+                            .withExpiresAt(OffsetDateTime.now().plusDays(30).toInstant())
                             .sign(cripto);
             return token;
         } catch (Exception e) {

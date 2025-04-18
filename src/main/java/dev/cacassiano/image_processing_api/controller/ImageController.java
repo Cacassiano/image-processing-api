@@ -50,9 +50,11 @@ public class ImageController {
             throw new NullPointerException("Invalid request: image not found");
         }
         if (destFormat.equals("jpeg")) {
-            return service.pngToJpeg(ImageIO.read(image.getInputStream()));
+            byte[] nImage = service.pngToJpeg(ImageIO.read(image.getInputStream()));
+            return ResponseEntity.ok().body(nImage);
         } else {
-            return service.jpegToPng(ImageIO.read(image.getInputStream()));
+            byte[] nImage = service.jpegToPng(ImageIO.read(image.getInputStream()));
+            return ResponseEntity.internalServerError().body(nImage);
         }
 
     }

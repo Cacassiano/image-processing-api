@@ -4,14 +4,29 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.client.fluent.Request;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.execchain.RequestAbortedException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import dev.cacassiano.image_processing_api.dto.ImageConversion;
 
 @Service
 public class FiltersService extends ImageConversion{
 
+    @Value("${remove-bg.api.url}")
+    private String url;
+    @Value("${remove-bg.api.key}")
+    private String key;
+
+    @Autowired
+    ImageService imageService;
+    
     public ResponseEntity<byte[]> toBlackAndWhite(BufferedImage image, String format) throws IOException {
         
         for (int i = 0; i< image.getWidth();i++) {
@@ -72,5 +87,22 @@ public class FiltersService extends ImageConversion{
           return this.imagemResponseDTO(image, format);
         }
     */
+
+    public byte[] removeBack(MultipartFile image) throws IOException {
+        try {
+            HttpEntity entity = MultipartEntityBuilder.create()
+                                    .addBinaryBody("image_file", image.getBytes())
+                                    .addTextBody("size", "auto")
+                                    .build();
+            byte[] response = Request.Post(url)
+                                .addHeader("X-Api-Key", key)
+                                .body(entity)
+                                .execute().returnContent().asBytes();
+            return response;
+        } catch (RequestAbortedException e) {
+            return null;
+        }
+        
+    }
     
 }

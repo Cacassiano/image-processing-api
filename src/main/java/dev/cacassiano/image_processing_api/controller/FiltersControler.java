@@ -37,6 +37,7 @@ public class FiltersControler {
 
         return service.toSepia(ImageIO.read(image.getInputStream()), format);
     }
+
     /*  Codigo de servico esta defeituoso 
 
         @PostMapping(value = "/blur", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -47,4 +48,22 @@ public class FiltersControler {
             return service.toBlur(ImageIO.read(image.getInputStream()), format);
         }
     */
+
+    @PostMapping(value = "/bgRemove", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<byte[]> removeBackground(MultipartFile image) throws IOException {
+        if (image == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        byte[] myImage = service.removeBack(image);
+
+        if (myImage != null) {
+            return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_PNG)
+                    .body(myImage);
+        } else {
+            return ResponseEntity.internalServerError().body(myImage);
+        }
+
+    }
 }
