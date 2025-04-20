@@ -19,11 +19,11 @@ public class TokenService {
     private String issuer;
     public String createToken(String email) {
         try {
-            Algorithm cripto = Algorithm.HMAC512(secretKey); 
+            Algorithm cripto = Algorithm.HMAC256(secretKey); 
             String token = JWT.create()
                             .withIssuer(issuer)
                             .withSubject(email)
-                            .withExpiresAt(OffsetDateTime.now().plusDays(30).toInstant())
+                            .withExpiresAt(OffsetDateTime.now().plusHours(2).toInstant())
                             .sign(cripto);
             return token;
         } catch (Exception e) {
@@ -33,7 +33,7 @@ public class TokenService {
 
     public String validateToken(String token){
         try {
-            Algorithm cripto = Algorithm.HMAC512(secretKey); 
+            Algorithm cripto = Algorithm.HMAC256(secretKey); 
             return JWT.require(cripto)
                     .withIssuer(issuer)
                     .build()
