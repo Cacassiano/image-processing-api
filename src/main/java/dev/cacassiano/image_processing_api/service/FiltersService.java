@@ -8,27 +8,22 @@ import org.apache.http.HttpEntity;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.execchain.RequestAbortedException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import dev.cacassiano.image_processing_api.dto.ImageConversion;
+import dev.cacassiano.image_processing_api.service.interfaces.ImageToByteConversor;
+
 
 @Service
-public class FiltersService extends ImageConversion{
+public class FiltersService extends ImageToByteConversor{
 
     @Value("${remove-bg.api.url}")
     private String url;
     @Value("${remove-bg.api.key}")
     private String key;
-
-    @Autowired
-    ImageService imageService;
     
-    public ResponseEntity<byte[]> toBlackAndWhite(BufferedImage image, String format) throws IOException {
-        
+    public byte[] toBlackAndWhite(BufferedImage image, String format) throws IOException {
         for (int i = 0; i< image.getWidth();i++) {
             for (int j = 0; j< image.getHeight();j++) {
                 Color pixelRGB = new Color(image.getRGB(i, j));
@@ -40,10 +35,10 @@ public class FiltersService extends ImageConversion{
             }
         }
 
-        return this.imagemResponseDTO(image, format);
+        return this.imageToByteArray(image, format);
     }
 
-    public ResponseEntity<byte[]> toSepia(BufferedImage image, String format) throws IOException {
+    public byte[] toSepia(BufferedImage image, String format) throws IOException {
         int maxX = image.getWidth(), maxY = image.getHeight();
         final int maxRGB = 255, redIntensity  =60;
         
@@ -62,7 +57,7 @@ public class FiltersService extends ImageConversion{
             }
         }
 
-        return this.imagemResponseDTO(image, format);
+        return this.imageToByteArray(image, format);
     }
     /* codigo defeituoso
         public ResponseEntity<byte[]> toBlur(BufferedImage image, String format) throws IOException {
@@ -90,14 +85,17 @@ public class FiltersService extends ImageConversion{
 
     public byte[] removeBack(MultipartFile image) throws IOException {
         try {
+            // Create the multipart entity to send
             HttpEntity entity = MultipartEntityBuilder.create()
-                                    .addBinaryBody("image_file", image.getBytes())
-                                    .addTextBody("size", "auto")
-                                    .build();
+                .addBinaryBody("image_file", image.getBytes())
+                .addTextBody("size", "auto")
+                .build();
+            // Send the request with the multipart entity as body
+            // and get the image bytes
             byte[] response = Request.Post(url)
-                                .addHeader("X-Api-Key", key)
-                                .body(entity)
-                                .execute().returnContent().asBytes();
+                .addHeader("X-Api-Key", key)
+                .body(entity)
+                .execute().returnContent().asBytes();
             return response;
         } catch (RequestAbortedException e) {
             return null;

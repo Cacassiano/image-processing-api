@@ -12,20 +12,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import dev.cacassiano.image_processing_api.service.ConversionService;
 import dev.cacassiano.image_processing_api.service.ImageService;
+import dev.cacassiano.image_processing_api.service.ResponseService;
 
 @RestController
-@RequestMapping("/image")
+@RequestMapping("/images")
 public class ImageController {
+    
     @Autowired
-    private ImageService service;
+    private ConversionService conversionService;
+    @Autowired
+    private ImageService imageService;
+    @Autowired
+    private ResponseService responseService;
+
 
     @PostMapping(value = "/mirror", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<byte[]> mirrorEndpoint(MultipartFile image, String format) throws IOException {
         if (image == null) {
             throw new NullPointerException("Invalid request: image not found");
         }
-        return service.mirrorImage(ImageIO.read(image.getInputStream()), format);
+        byte[] newImage = imageService.mirrorImage(ImageIO.read(image.getInputStream()), format);
+        return responseService.createImageResponse(newImage, format);
     }
 
     @PostMapping(value = "/scale", consumes = MediaType.MULTIPART_FORM_DATA_VALUE) 
@@ -33,29 +42,26 @@ public class ImageController {
         if (image == null) {
             throw new NullPointerException("Invalid request: image not found"); 
         }
-        return service.rescaleImage(ImageIO.read(image.getInputStream()), format, scaleX, scaleY);
+        byte[] newImage = imageService.rescaleImage(ImageIO.read(image.getInputStream()), format, scaleX, scaleY);
+        return responseService.createImageResponse(newImage, format);
     }
 
     @PostMapping(value = "/rotate", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<byte[]> rotateImage(MultipartFile image, String format, Double inclination) throws IOException {
+    public ResponseEntity<byte[]> rotateImage(MultipartFile image, String format, Double inclinationInDegrees) throws IOException {
         if (image == null) {
             throw new NullPointerException("Invalid request: image not found");
         }
-        return service.rotateImage(ImageIO.read(image.getInputStream()), inclination, format);
+        byte[] newImage = imageService.rotateImage(ImageIO.read(image.getInputStream()), inclinationInDegrees, format);
+        return responseService.createImageResponse(newImage, format);
     }
 
     @PostMapping(value = "/convert", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    // TODO validar a entrada com bean validation e usar ENUM de tipos aceitos
     public ResponseEntity<byte[]> convertTypes(MultipartFile image, String destFormat) throws IOException {
         if (image == null) {
             throw new NullPointerException("Invalid request: image not found");
         }
-        if (destFormat.equals("jpeg")) {
-            byte[] nImage = service.pngToJpeg(ImageIO.read(image.getInputStream()));
-            return ResponseEntity.ok().body(nImage);
-        } else {
-            byte[] nImage = service.jpegToPng(ImageIO.read(image.getInputStream()));
-            return ResponseEntity.internalServerError().body(nImage);
-        }
-
+        byte[] newImage = conversionService.convert(image, destFormat);
+        return responseService.createImageResponse(newImage, destFormat);
     }
 }

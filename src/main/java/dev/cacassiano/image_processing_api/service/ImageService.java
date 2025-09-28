@@ -1,79 +1,76 @@
 package dev.cacassiano.image_processing_api.service;
 
-import java.awt.Color;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import dev.cacassiano.image_processing_api.dto.ImageConversion;
+import dev.cacassiano.image_processing_api.service.interfaces.ImageToByteConversor;
 
 @Service
-public class ImageService extends ImageConversion{
+public class ImageService extends ImageToByteConversor{
 
-    public ResponseEntity<byte[]> mirrorImage(BufferedImage originalIOImage, String format) throws IOException {
-        
+    // Mirror the sended image
+    public byte[] mirrorImage(BufferedImage originalIOImage, String format) throws IOException {
+        // Create a AffineTransform object with a -1 x scale instance
         AffineTransform transform = AffineTransform.getScaleInstance(-1, 1);
+        // Translate the image all your length backwards, to when the scale negative be applied
+        // the length dont be less than 0
         transform.translate(-originalIOImage.getWidth(), 0);
 
+        // Create AffinetransformOp Object with the previus transformation
         AffineTransformOp operation = new AffineTransformOp(transform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+        // Apply the operation to the received image, and send to a "null destination" 
         BufferedImage newImage = operation.filter(originalIOImage, null);
         
-        return this.imagemResponseDTO(newImage, format);
+        // return the ResponseEntity with the bytes of the image and MIME type in header
+        return this.imageToByteArray(newImage, format);
     }
 
-    public ResponseEntity<byte[]> rescaleImage(BufferedImage original, String format, Float scaleX, Float scaleY) throws IOException {
+    // Apply rescales to the image
+    public byte[] rescaleImage(BufferedImage original, String format, Float scaleX, Float scaleY) throws IOException {
+        
+        // Create Affine transform object with the given scale values
         AffineTransform transform = AffineTransform.getScaleInstance(scaleX, scaleY);
+        // Make a scale transformation
         transform.scale(transform.getScaleX(), transform.getScaleY());
         
-        AffineTransformOp operation; 
-        if (format.equals("jpeg")) {
-            operation = new AffineTransformOp(transform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-        } else {
-            operation = new AffineTransformOp(transform, AffineTransformOp.TYPE_BICUBIC);
-        }
-        
+        // Create TransformOperation object with the transforms above
+        AffineTransformOp operation = new AffineTransformOp(transform, AffineTransformOp.TYPE_BICUBIC);
+        // Create the image with the new scale
         BufferedImage newImage = operation.filter(original, null);
-        return this.imagemResponseDTO(newImage, format);
+
+        // Return the ResponseEntity with the image & MIME header
+        return this.imageToByteArray(newImage, format);
     }
 
-    public ResponseEntity<byte[]> rotateImage(BufferedImage original, Double inclination, String format) throws IOException {
-        
+    // apply aa rotation angle () to the image 
+    public byte[] rotateImage(BufferedImage original, Double inclinationInDegrees, String format) throws IOException {
+        // save the original x and y image's values
         int x = original.getWidth(), y = original.getHeight();
+        // Create a copy of the original image (?)
         BufferedImage temp = original;
-        if( inclination == 270) {
-            inclination = -90.0;
-        }
-        if (inclination == 90 || inclination == -90) {
-            temp = new BufferedImage(y, x, original.getType());
+
+        // if the rotation angle make the image perfectly horizontal swap the y and x 
+        if (inclinationInDegrees%90 == 0 && (inclinationInDegrees/90)%2 != 0) {
+            temp = new BufferedImage(y, x, temp.getType());
             temp.createGraphics().drawImage(original, null, y, x);
         }
 
+        // Create transform Object        
         AffineTransform transform = new AffineTransform();
-        transform.rotate(Math.toRadians(inclination), temp.getWidth()/2, temp.getHeight()/2);
+        // Apply a rotate transformation that starts at the center of the image 
+        transform.rotate(Math.toRadians(inclinationInDegrees), temp.getWidth()/2, temp.getHeight()/2);
 
+        // Create transformOperation with the transform settings above 
         AffineTransformOp operation = new AffineTransformOp(transform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+        // Create a new image with the operatipon created
         BufferedImage newImage = operation.filter(original, null);
         
-        
-        return this.imagemResponseDTO(newImage, format);
-    }
-
-    public byte[] pngToJpeg(BufferedImage original) throws IOException {
-        BufferedImage temp = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_RGB);
-        temp.createGraphics().drawImage(original,0,0,Color.WHITE,null);
-        ResponseEntity<byte[]> conversed = this.imagemResponseDTO(temp, "jpeg");
-        return conversed.getBody();
-    }
-
-    public byte[] jpegToPng(BufferedImage original) throws IOException {
-        BufferedImage temp = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
-        temp.createGraphics().drawImage(original,0,0,new Color(0,0,0,0),null);
-        ResponseEntity<byte[]> conversed = this.imagemResponseDTO(temp, "png");
-        return conversed.getBody();
+        // Return the ResponseEntity with image & MIME header
+        return this.imageToByteArray(newImage, format);
     }
     
 }

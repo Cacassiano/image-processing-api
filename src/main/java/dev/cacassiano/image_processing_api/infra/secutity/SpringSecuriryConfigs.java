@@ -31,9 +31,9 @@ public class SpringSecuriryConfigs {
             .csrf(csfr -> csfr.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(proxy -> proxy
-                .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-                .anyRequest().authenticated()
+                // .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                // .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                .anyRequest().permitAll()
             )
             .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();  
