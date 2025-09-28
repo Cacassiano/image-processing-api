@@ -13,6 +13,7 @@ import org.springframework.web.method.annotation.HandlerMethodValidationExceptio
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 
+import dev.cacassiano.image_processing_api.exceptions.custom.SupportedTypesException;
 import dev.cacassiano.image_processing_api.exceptions.custom.ValidationExceptionDTO;
 
 @RestControllerAdvice
@@ -27,6 +28,14 @@ public class GlobalExcetionHandler {
                 .map(MessageSourceResolvable::getDefaultMessage)
                 .toList()
         );
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(SupportedTypesException.class)
+    public ResponseEntity<Map<String, String>> supportedTypesHandler(SupportedTypesException ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("error", "Invalid arguments in the request");
+        response.put("message", ex.getMessage());
         return ResponseEntity.badRequest().body(response);
     }
 

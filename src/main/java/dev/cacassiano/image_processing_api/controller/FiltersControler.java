@@ -10,13 +10,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
+import dev.cacassiano.image_processing_api.dto.ImageRequestDTO;
 import dev.cacassiano.image_processing_api.service.FiltersService;
 import dev.cacassiano.image_processing_api.service.ResponseService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 @RestController
 @RequestMapping("/images/filters")
@@ -29,27 +27,17 @@ public class FiltersControler {
 
     // TODO ajustes quanto a como lidar com png's
     @PostMapping(value = "/black-and-white", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<byte[]> filterBlackAndWhite(
-            @Valid @NotNull(message="image is null") 
-            MultipartFile image, 
-            @Valid @NotBlank(message="there is no format") 
-            String format
-        ) throws IOException {
+    public ResponseEntity<byte[]> filterBlackAndWhite(@Valid ImageRequestDTO dto) throws IOException {
         
-        byte[] newImage = service.toBlackAndWhite(ImageIO.read(image.getInputStream()), format);
-        return responseService.createImageResponse(newImage, format);
+        byte[] newImage = service.toBlackAndWhite(ImageIO.read(dto.getImage().getInputStream()), dto.getFormat());
+        return responseService.createImageResponse(newImage, dto.getFormat());
     }
 
     @PostMapping(value = "/sepia" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<byte[]> filterSepia(
-            @Valid @NotNull(message="image is null") 
-            MultipartFile image, 
-            @Valid @NotBlank(message="there is no format") 
-            String format
-        ) throws IOException {
+    public ResponseEntity<byte[]> filterSepia(@Valid ImageRequestDTO dto) throws IOException {
         
-        byte[] newImage = service.toSepia(ImageIO.read(image.getInputStream()), format); 
-        return responseService.createImageResponse(newImage, format);
+        byte[] newImage = service.toSepia(ImageIO.read(dto.getImage().getInputStream()), dto.getFormat()); 
+        return responseService.createImageResponse(newImage, dto.getFormat());
     }
 
     /*  Unnimplemented yet
@@ -64,12 +52,9 @@ public class FiltersControler {
     */
 
     @PostMapping(value = "/remove-background", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<byte[]> removeBackground(
-            @Valid @NotNull(message="image is null") 
-            MultipartFile image
-        ) throws IOException {
+    public ResponseEntity<byte[]> removeBackground(@Valid ImageRequestDTO dto) throws IOException {
         
-        byte[] myImage = service.removeBack(image);
+        byte[] myImage = service.removeBack(dto.getImage());
         // Return png because is the unique image type that acepts transparency
         return responseService.createImageResponse(myImage, "png");
     }
