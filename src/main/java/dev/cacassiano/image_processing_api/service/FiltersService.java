@@ -18,9 +18,9 @@ import dev.cacassiano.image_processing_api.service.interfaces.ImageToByteConvers
 @Service
 public class FiltersService extends ImageToByteConversor{
 
-    @Value("${remove-bg.api.url}")
+    @Value("${remove-bg_API_URL}")
     private String url;
-    @Value("${remove-bg.api.key}")
+    @Value("${remove-bg_API_KEY}")
     private String key;
     
     public byte[] toBlackAndWhite(BufferedImage image, String format) throws IOException {

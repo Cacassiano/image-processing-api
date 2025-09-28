@@ -15,6 +15,9 @@ import org.springframework.web.multipart.MultipartFile;
 import dev.cacassiano.image_processing_api.service.ConversionService;
 import dev.cacassiano.image_processing_api.service.ImageService;
 import dev.cacassiano.image_processing_api.service.ResponseService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @RestController
 @RequestMapping("/images")
@@ -29,39 +32,57 @@ public class ImageController {
 
 
     @PostMapping(value = "/mirror", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<byte[]> mirrorEndpoint(MultipartFile image, String format) throws IOException {
-        if (image == null) {
-            throw new NullPointerException("Invalid request: image not found");
-        }
-        byte[] newImage = imageService.mirrorImage(ImageIO.read(image.getInputStream()), format);
+    public ResponseEntity<byte[]> mirrorEndpoint(
+            @Valid @NotNull(message="image is null") 
+            MultipartFile image, 
+            @Valid @NotBlank(message="there is no format") 
+            String format
+        ) throws IOException {
+       
+         byte[] newImage = imageService.mirrorImage(ImageIO.read(image.getInputStream()), format);
         return responseService.createImageResponse(newImage, format);
     }
 
     @PostMapping(value = "/scale", consumes = MediaType.MULTIPART_FORM_DATA_VALUE) 
-    public ResponseEntity<byte[]> scaleImage(MultipartFile image, String format, Float scaleX, Float scaleY) throws IOException{
-        if (image == null) {
-            throw new NullPointerException("Invalid request: image not found"); 
-        }
+    public ResponseEntity<byte[]> scaleImage(
+            @Valid @NotNull(message="image is null") 
+            MultipartFile image, 
+            @Valid @NotBlank(message="there is no format") 
+            String format,
+            @Valid @NotNull(message="x scale is null") 
+            Float scaleX, 
+            @Valid @NotNull(message="y scale is null")
+            Float scaleY
+        ) throws IOException{
+        
         byte[] newImage = imageService.rescaleImage(ImageIO.read(image.getInputStream()), format, scaleX, scaleY);
         return responseService.createImageResponse(newImage, format);
     }
 
     @PostMapping(value = "/rotate", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<byte[]> rotateImage(MultipartFile image, String format, Double inclinationInDegrees) throws IOException {
-        if (image == null) {
-            throw new NullPointerException("Invalid request: image not found");
-        }
+    public ResponseEntity<byte[]> rotateImage(
+            @Valid @NotNull(message="image is null") 
+            MultipartFile image, 
+            @Valid @NotBlank(message="there is no format") 
+            String format, 
+            @Valid @NotNull(message="Inclination angle is null") 
+            Double inclinationInDegrees
+        ) throws IOException {
+        
         byte[] newImage = imageService.rotateImage(ImageIO.read(image.getInputStream()), inclinationInDegrees, format);
         return responseService.createImageResponse(newImage, format);
     }
 
     @PostMapping(value = "/convert", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     // TODO validar a entrada com bean validation e usar ENUM de tipos aceitos
-    public ResponseEntity<byte[]> convertTypes(MultipartFile image, String destFormat) throws IOException {
-        if (image == null) {
-            throw new NullPointerException("Invalid request: image not found");
-        }
-        byte[] newImage = conversionService.convert(image, destFormat);
-        return responseService.createImageResponse(newImage, destFormat);
+    public ResponseEntity<byte[]> convertImage(
+            @Valid @NotNull(message="image is null") 
+            MultipartFile image, 
+            @Valid @NotBlank(message="there is no format") 
+            String format
+        ) throws IOException {
+        
+        byte[] newImage = conversionService.convert(image, format);
+        return responseService.createImageResponse(newImage, format);
     }
 }

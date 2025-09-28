@@ -11,6 +11,7 @@ public abstract class ImageToByteConversor {
     public byte[] imageToByteArray(BufferedImage image, String format) throws IOException {
         ByteArrayOutputStream storage = new ByteArrayOutputStream();
         ImageIO.write(image, format, storage);
+        if(storage.toByteArray().length < 2) throw new IOException("Error while creating image bytes");
         return storage.toByteArray();
     }   
 }
