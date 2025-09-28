@@ -4,7 +4,7 @@ public enum SupportedTypes {
     PNG("png"),
     JPEG("jpeg");
 
-    private String value;
+    private final String value;
 
     SupportedTypes(String value) {
         this.value = value;

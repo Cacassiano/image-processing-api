@@ -20,6 +20,7 @@ import jakarta.validation.constraints.NotNull;
 
 @RestController
 @RequestMapping("/images")
+// TODO tests unitarios
 public class ImageController {
     
     @Autowired

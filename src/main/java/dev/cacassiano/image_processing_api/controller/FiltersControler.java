@@ -15,6 +15,8 @@ import dev.cacassiano.image_processing_api.dto.ImageRequestDTO;
 import dev.cacassiano.image_processing_api.service.FiltersService;
 import dev.cacassiano.image_processing_api.service.ResponseService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 
 @RestController
 @RequestMapping("/images/filters")
@@ -25,7 +27,6 @@ public class FiltersControler {
     @Autowired
     private ResponseService responseService;
 
-    // TODO ajustes quanto a como lidar com png's
     @PostMapping(value = "/black-and-white", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<byte[]> filterBlackAndWhite(@Valid ImageRequestDTO dto) throws IOException {
         
@@ -33,10 +34,16 @@ public class FiltersControler {
         return responseService.createImageResponse(newImage, dto.getFormat());
     }
 
+    // TODO DTO's separados
     @PostMapping(value = "/sepia" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<byte[]> filterSepia(@Valid ImageRequestDTO dto) throws IOException {
+    public ResponseEntity<byte[]> filterSepia(
+            @Valid 
+            ImageRequestDTO dto,
+            @Valid @Min(value = 0l, message="The min value of intesity is 0") @Max(value = 255l, message="The max value of intensity is 255") 
+            Integer saturation
+        ) throws IOException {
         
-        byte[] newImage = service.toSepia(ImageIO.read(dto.getImage().getInputStream()), dto.getFormat()); 
+        byte[] newImage = service.toSepia(ImageIO.read(dto.getImage().getInputStream()), dto.getFormat(), saturation); 
         return responseService.createImageResponse(newImage, dto.getFormat());
     }
 
