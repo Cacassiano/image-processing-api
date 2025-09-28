@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import dev.cacassiano.image_processing_api.dto.ImageRequestDTO;
 import dev.cacassiano.image_processing_api.service.ConversionService;
@@ -76,7 +77,10 @@ public class ImageController {
     // TODO validar a entrada com bean validation e usar ENUM de tipos aceitos
     public ResponseEntity<byte[]> convertImage(@Valid ImageRequestDTO dto) throws IOException {
         
-        byte[] newImage = conversionService.convert(dto.getImage(), dto.getFormat());
+        byte[] newImage = conversionService.convert(
+            ImageIO.read(dto.getImage().getInputStream()), 
+            dto.getFormat()
+        );
         return responseService.createImageResponse(newImage, dto.getFormat());
     }
 }
