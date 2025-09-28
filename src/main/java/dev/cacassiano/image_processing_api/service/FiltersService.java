@@ -25,8 +25,9 @@ public class FiltersService extends ImageToByteConversor{
     
     public byte[] toBlackAndWhite(BufferedImage image, String format) throws IOException {
         for (int i = 0; i< image.getWidth();i++) {
-            for (int j = 0; j< image.getHeight();j++) {
-                Color pixelRGB = new Color(image.getRGB(i, j));
+            for (int j = 0; j< image.getHeight(); j++) {
+                Color pixelRGB = new Color(image.getRGB(i, j), true);
+                if(pixelRGB.getAlpha() == 0) continue;
 
                 int newTone = (pixelRGB.getRed() + pixelRGB.getGreen()+ pixelRGB.getBlue())/3;
 
@@ -45,7 +46,9 @@ public class FiltersService extends ImageToByteConversor{
         for(int i = 0; i<maxY;i++) {
             for (int j=0; j<maxX;j++){
                 int rgbOriginal = image.getRGB(j,i);
-                Color color = new Color(rgbOriginal);
+                
+                Color color = new Color(rgbOriginal, true);
+                if(color.getAlpha() == 0) continue;
 
                 int avg = (color.getRed() + color.getBlue() + color.getGreen())/3;
                 int blue = avg;

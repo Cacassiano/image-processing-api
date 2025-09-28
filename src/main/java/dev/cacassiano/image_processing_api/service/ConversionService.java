@@ -11,7 +11,6 @@ import dev.cacassiano.image_processing_api.service.interfaces.ImageToByteConvers
 @Service
 public class ConversionService extends ImageToByteConversor{
 
-    // TODO refact para aceitar mais tipos de image como gif e etc
     public byte[] convert(BufferedImage image, String destFormat) throws IOException {
         BufferedImage newImage = new BufferedImage(
             image.getWidth(),
