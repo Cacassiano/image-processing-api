@@ -50,8 +50,16 @@ public class GlobalExcetionHandler {
     @ExceptionHandler(IOException.class)
     public ResponseEntity<Map<String, String>> ioExceptionHandler(IOException ex){
         Map<String, String> response = new HashMap<>();
-        response.put("error", "IOException");
         response.put("message", ex.getMessage());
         return ResponseEntity.unprocessableEntity().body(response);
+    }
+
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> exceptionHandler(Exception ex) {
+        Map<String, String> response = new HashMap<>();
+        response.put("message", ex.getMessage());
+
+        return ResponseEntity.internalServerError().body(response);
     }
 }

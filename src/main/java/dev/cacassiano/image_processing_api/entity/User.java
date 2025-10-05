@@ -1,11 +1,14 @@
 package dev.cacassiano.image_processing_api.entity;
 
+import java.util.List;
+
 import dev.cacassiano.image_processing_api.infra.secutity.dto.RegisterDTO;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,7 +30,7 @@ public class User {
     @Id @GeneratedValue(strategy = GenerationType.UUID) @Column(unique = true, nullable = false)
     String id;
     
-    @Column( nullable = false)
+    @Column(nullable = false)
     String password;
 
     @Column( unique = true , nullable = false)
@@ -35,4 +38,7 @@ public class User {
 
     @Column( nullable = false)
     String username;
+
+    @OneToMany(mappedBy="id")
+    List<Image> images;
 }

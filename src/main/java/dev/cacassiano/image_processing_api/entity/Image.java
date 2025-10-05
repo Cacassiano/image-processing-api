@@ -5,22 +5,24 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity(name = "Image")
-@Table(name = "image")
+@Table(name = "Image")
 @Setter
 @Getter
 @NoArgsConstructor
-public class ImageEntity {
+public class Image {
 
-    public ImageEntity(byte[] byteImage ,String format, String title , String dono) {
-        this.dono = dono;
-        this.image = byteImage;
-        this.title = title;
+    public Image(String url ,String format, String name , User user) {
+        this.user = user;
+        this.url = url;
+        this.name = name;
         this.format = format;
     }
 
@@ -28,14 +30,16 @@ public class ImageEntity {
     String id;
 
     @Column(nullable = false)
-    byte[] image;
+    String url;
 
-    @Column(nullable = false)
-    String dono;
-
-    String title;
+    @Column(name="name")
+    String name;
 
     @Column(nullable = false)
     String format;
+
+    @ManyToOne
+    @JoinColumn(name="owner")
+    User user;
 
 }

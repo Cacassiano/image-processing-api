@@ -7,7 +7,6 @@ import java.io.IOException;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.execchain.RequestAbortedException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -104,27 +103,20 @@ public class FiltersService extends ImageToByteConversor{
         }
     */
 
-    // TODO exception handling para o RequestAbortedException ao inves do 'return null'
     public byte[] removeBack(MultipartFile image) throws IOException {
-        try {
-            // Create the multipart entity to send
-            HttpEntity entity = MultipartEntityBuilder.create()
-                .addBinaryBody("image_file", image.getBytes())
-                .addTextBody("size", "auto")
-                .build();
-            // Send the request with the multipart entity as payload
-            // and get the image bytes
-            byte[] response = Request.Post(url)
-                .addHeader("X-Api-Key", key)
-                .body(entity)
-                .execute().returnContent().asBytes();
-            // Return the image bynaries
-            return response;
-        } catch (RequestAbortedException e) {
-            // on error return null
-            return null;
-        }
-        
+        // Create the multipart entity to send
+        HttpEntity entity = MultipartEntityBuilder.create()
+            .addBinaryBody("image_file", image.getBytes())
+            .addTextBody("size", "auto")
+            .build();
+        // Send the request with the multipart entity as payload
+        // and get the image bytes
+        byte[] response = Request.Post(url)
+            .addHeader("X-Api-Key", key)
+            .body(entity)
+            .execute().returnContent().asBytes();
+        // Return the image bynaries
+        return response;
     }
     
 }
