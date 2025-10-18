@@ -7,15 +7,17 @@ import java.io.IOException;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import dev.cacassiano.image_processing_api.service.interfaces.ImageToByteConversor;
-
 
 @Service
-public class FiltersService extends ImageToByteConversor{
+public class FiltersService{
+
+    @Autowired
+    private ImageConversorService conversor;
 
     @Value("${remove-bg_API_URL}")
     private String url;
@@ -42,7 +44,7 @@ public class FiltersService extends ImageToByteConversor{
             }
         }
         // Return the image bytes
-        return this.imageToByteArray(image, format);
+        return conversor.imageToByteArray(image, format);
     }
 
     public byte[] toSepia(BufferedImage image, String format, int saturation) throws IOException {
@@ -77,7 +79,7 @@ public class FiltersService extends ImageToByteConversor{
             }
         }
         // Return the image bytes
-        return this.imageToByteArray(image, format);
+        return conversor.imageToByteArray(image, format);
     }
     /* codigo defeituoso
         public ResponseEntity<byte[]> toBlur(BufferedImage image, String format) throws IOException {

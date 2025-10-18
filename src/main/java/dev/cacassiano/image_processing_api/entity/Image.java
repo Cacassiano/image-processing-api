@@ -19,8 +19,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Image {
 
-    public Image(String url ,String format, String name , User user) {
-        this.user = user;
+    public Image(String url ,String format, String name) {
+        // this.user = userr
         this.url = url;
         this.name = name;
         this.format = format;
@@ -38,8 +38,8 @@ public class Image {
     @Column(nullable = false)
     String format;
 
-    @ManyToOne
-    @JoinColumn(name="owner")
-    User user;
+    // @ManyToOne
+    // @JoinColumn(name="owner")
+    // User user;
 
 }

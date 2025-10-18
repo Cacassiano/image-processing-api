@@ -5,12 +5,14 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import dev.cacassiano.image_processing_api.service.interfaces.ImageToByteConversor;
-
 @Service
-public class ImageService extends ImageToByteConversor{
+public class ImageTransformService{
+
+    @Autowired
+    private ImageConversorService conversor;
 
     // Mirror the sended image
     public byte[] mirrorImage(BufferedImage originalIOImage, String format) throws IOException {
@@ -26,7 +28,7 @@ public class ImageService extends ImageToByteConversor{
         BufferedImage newImage = operation.filter(originalIOImage, null);
         
         // return the ResponseEntity with the bytes of the image and MIME type in header
-        return this.imageToByteArray(newImage, format);
+        return conversor.imageToByteArray(newImage, format);
     }
 
     // Apply rescales to the image
@@ -43,7 +45,7 @@ public class ImageService extends ImageToByteConversor{
         BufferedImage newImage = operation.filter(original, null);
 
         // Return the ResponseEntity with the image & MIME header
-        return this.imageToByteArray(newImage, format);
+        return conversor.imageToByteArray(newImage, format);
     }
 
     // apply aa rotation angle () to the image 
@@ -54,7 +56,7 @@ public class ImageService extends ImageToByteConversor{
         BufferedImage temp = original;
 
         // if the rotation angle make the image perfectly horizontal swap the y and x 
-        if (inclinationInDegrees%90 == 0 && (inclinationInDegrees/90)%2 != 0) {
+        if (inclinationInDegrees % 90 == 0 && (inclinationInDegrees / 90) % 2 != 0) {
             temp = new BufferedImage(y, x, temp.getType());
             temp.createGraphics().drawImage(original, null, y, x);
         }
@@ -62,15 +64,15 @@ public class ImageService extends ImageToByteConversor{
         // Create transform Object        
         AffineTransform transform = new AffineTransform();
         // Apply a rotate transformation that starts at the center of the image 
-        transform.rotate(Math.toRadians(inclinationInDegrees), temp.getWidth()/2, temp.getHeight()/2);
+        transform.rotate(Math.toRadians(inclinationInDegrees), temp.getWidth() / 2, temp.getHeight() / 2);
 
         // Create transformOperation with the transform settings above 
         AffineTransformOp operation = new AffineTransformOp(transform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
         // Create a new image with the operatipon created
         BufferedImage newImage = operation.filter(original, null);
-        
+
         // Return the ResponseEntity with image & MIME header
-        return this.imageToByteArray(newImage, format);
+        return conversor.imageToByteArray(newImage, format);
     }
     
 }
