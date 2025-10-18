@@ -1,16 +1,22 @@
 package dev.cacassiano.image_processing_api.controller;
 
+
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
 import dev.cacassiano.image_processing_api.dto.ImageUploadDTO;
 import dev.cacassiano.image_processing_api.dto.ImageUploadRespDTO;
+import dev.cacassiano.image_processing_api.entity.Image;
+import dev.cacassiano.image_processing_api.exceptions.custom.NotFoundException;
 import dev.cacassiano.image_processing_api.service.ImageConversorService;
 import dev.cacassiano.image_processing_api.service.interfaces.ImageStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,10 +52,13 @@ public class ImageController {
         return ResponseEntity.ok(new ImageUploadRespDTO(id));
     }
 
-    @PostMapping(value = "/mirror", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<byte[]> mirrorEndpoint(@Valid ImageRequestDTO dto) throws IOException {
-        byte[] newImage = imageTransformService.mirrorImage(ImageIO.read(dto.getImage().getInputStream()), dto.getFormat());
-        return responseService.createImageResponse(newImage, dto.getFormat());
+    @PostMapping(value = "/mirror/{imgId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<byte[]> mirrorEndpoint(@PathVariable String imgId) throws NotFoundException, IOException {
+        Image img = storageService.findImageById(imgId);
+        File imgFile = new File("storage/"+img.getUrl());
+
+        byte[] newImage = imageTransformService.mirrorImage(ImageIO.read(imgFile), img.getFormat());
+        return responseService.createImageResponse(newImage, img.getFormat());
     }
 
     @PostMapping(value = "/scale", consumes = MediaType.MULTIPART_FORM_DATA_VALUE) 
@@ -89,7 +98,6 @@ public class ImageController {
 
     @PostMapping(value = "/convert", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<byte[]> convertImage(@Valid ImageRequestDTO dto) throws IOException {
-        
         byte[] newImage = conversor.convert(
             ImageIO.read(dto.getImage().getInputStream()), 
             dto.getFormat()

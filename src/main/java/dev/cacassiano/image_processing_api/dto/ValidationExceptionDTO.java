@@ -1,4 +1,4 @@
-package dev.cacassiano.image_processing_api.exceptions.custom;
+package dev.cacassiano.image_processing_api.dto;
 
 import java.util.List;
 
