@@ -1,5 +1,6 @@
 package dev.cacassiano.image_processing_api.service;
 
+import dev.cacassiano.image_processing_api.service.enums.ImageTypes;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;

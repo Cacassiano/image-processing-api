@@ -1,4 +1,4 @@
-package dev.cacassiano.image_processing_api.service;
+package dev.cacassiano.image_processing_api.service.enums;
 
 public enum SupportedTypes {
     PNG("png"),

@@ -23,15 +23,20 @@ public class ImageStorageServiceImpl implements ImageStorageService {
     public String saveImage(InputStream imageInputStream, String format, String name) throws IOException {
         // Create uuid to avoid name conflicts
         String id = UUID.randomUUID().toString();
+        // Create directory if dont exists
+        File storage = new File("storage");
+        if(!storage.exists()) {
+            System.out.println("create the storage: " + storage.mkdir());
+        }
         // Create a file object inside storage directory
         File imageFile = new File("storage/"+id+"."+format);
 
         try {
             // Write the image in the file
             ImageIO.write(
-                    ImageIO.read(imageInputStream),
-                    format,
-                    imageFile
+                ImageIO.read(imageInputStream),
+                format,
+                imageFile
             );
 
             // Create the file

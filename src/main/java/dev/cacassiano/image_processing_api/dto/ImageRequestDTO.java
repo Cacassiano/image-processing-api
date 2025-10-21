@@ -3,7 +3,7 @@ package dev.cacassiano.image_processing_api.dto;
 import org.springframework.web.multipart.MultipartFile;
 
 import dev.cacassiano.image_processing_api.exceptions.custom.SupportedTypesException;
-import dev.cacassiano.image_processing_api.service.SupportedTypes;
+import dev.cacassiano.image_processing_api.service.enums.SupportedTypes;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

@@ -52,6 +52,9 @@ public class ImageController {
         return ResponseEntity.ok(new ImageUploadRespDTO(id));
     }
 
+
+
+
     @PostMapping(value = "/mirror/{imgId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<byte[]> mirrorEndpoint(@PathVariable String imgId) throws NotFoundException, IOException {
         Image img = storageService.findImageById(imgId);
