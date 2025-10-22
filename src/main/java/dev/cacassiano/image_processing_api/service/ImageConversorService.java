@@ -19,7 +19,7 @@ public class ImageConversorService {
         return storage.toByteArray();
     }
 
-    public byte[] convert(BufferedImage image, String destFormat) throws IOException {
+    public BufferedImage convert(BufferedImage image, String destFormat) throws IOException {
         BufferedImage newImage = new BufferedImage(
                 image.getWidth(),
                 image.getHeight(),
@@ -27,6 +27,6 @@ public class ImageConversorService {
         );
 
         newImage.createGraphics().drawImage(image, 0, 0, Color.white, null);
-        return this.imageToByteArray(newImage, destFormat);
+        return newImage;
     }
 }

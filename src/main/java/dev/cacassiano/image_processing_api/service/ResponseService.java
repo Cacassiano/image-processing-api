@@ -1,7 +1,9 @@
 package dev.cacassiano.image_processing_api.service;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -9,7 +11,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class ResponseService {
 
-    public ResponseEntity<byte[]> createImageResponse(byte[] byteImage, String format) throws IOException {
+    @Autowired
+    private ImageConversorService conversor;
+
+    public ResponseEntity<byte[]> createImageResponse(BufferedImage image, String format) throws IOException {
+        byte[] byteImage = conversor.imageToByteArray(image, format);
+
         if (format.equals("png")) {
             return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_PNG)

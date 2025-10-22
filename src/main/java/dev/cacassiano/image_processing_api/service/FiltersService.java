@@ -3,6 +3,7 @@ package dev.cacassiano.image_processing_api.service;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.fluent.Request;
@@ -11,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.imageio.ImageIO;
 
 
 @Service
@@ -24,7 +27,7 @@ public class FiltersService{
     @Value("${remove-bg_API_KEY}")
     private String key;
     
-    public byte[] toBlackAndWhite(BufferedImage image, String format) throws IOException {
+    public void toBlackAndWhite(BufferedImage image, String format) throws IOException {
         // Iterate over all pixels in the image
         for (int i = 0; i< image.getWidth();i++) {
             for (int j = 0; j< image.getHeight(); j++) {
@@ -43,43 +46,39 @@ public class FiltersService{
                 image.setRGB(i, j,newColor);        
             }
         }
-        // Return the image bytes
-        return conversor.imageToByteArray(image, format);
     }
 
-    public byte[] toSepia(BufferedImage image, String format, int saturation) throws IOException {
+    public void toSepia(BufferedImage image, String format, int saturation) throws IOException {
         int maxX = image.getWidth(), maxY = image.getHeight();
         final int maxRGB = 255; 
 
         // Iterate over all image's pixels
         for(int i = 0; i<maxY;i++) {
-            for (int j=0; j<maxX;j++){
+            for (int j = 0; j < maxX; j++) {
                 // Get the original pixel RGB object
-                int rgbOriginal = image.getRGB(j,i);
+                int rgbOriginal = image.getRGB(j, i);
 
                 // Create a Color with Red, Green, Blue and Alpha from the 
                 // RGB object above
                 Color color = new Color(rgbOriginal, true);
                 // Checks if is not a translucent pixel
-                if(color.getAlpha() == 0) continue;
+                if (color.getAlpha() == 0) continue;
 
                 // Makes a avarage of the colors
-                int avg = (color.getRed() + color.getBlue() + color.getGreen())/3;
+                int avg = (color.getRed() + color.getBlue() + color.getGreen()) / 3;
                 // Sets blue with avg
                 int blue = avg;
                 // Sets red as avg + intensity to make the image more red
-                int red = Math.min(avg+saturation, maxRGB);
+                int red = Math.min(avg + saturation, maxRGB);
                 // Sets green as avg + intesity/3 to make the image more yellow/orange
-                int green = Math.min(avg+saturation/3, maxRGB);
+                int green = Math.min(avg + saturation / 3, maxRGB);
 
                 // Creates a new color with que new R, G & B values 
-                color = new Color(red,green, blue);
+                color = new Color(red, green, blue);
                 // the new color to the image pixel
-                image.setRGB(j,i, color.getRGB());
+                image.setRGB(j, i, color.getRGB());
             }
         }
-        // Return the image bytes
-        return conversor.imageToByteArray(image, format);
     }
     /* codigo defeituoso
         public ResponseEntity<byte[]> toBlur(BufferedImage image, String format) throws IOException {
@@ -105,7 +104,7 @@ public class FiltersService{
         }
     */
 
-    public byte[] removeBack(MultipartFile image) throws IOException {
+    public BufferedImage removeBack(MultipartFile image) throws IOException {
         // Create the multipart entity to send
         HttpEntity entity = MultipartEntityBuilder.create()
             .addBinaryBody("image_file", image.getBytes())
@@ -113,12 +112,12 @@ public class FiltersService{
             .build();
         // Send the request with the multipart entity as payload
         // and get the image bytes
-        byte[] response = Request.Post(url)
+        InputStream response = Request.Post(url)
             .addHeader("X-Api-Key", key)
             .body(entity)
-            .execute().returnContent().asBytes();
+            .execute().returnContent().asStream();
         // Return the image bynaries
-        return response;
+        return ImageIO.read(response);
     }
     
 }

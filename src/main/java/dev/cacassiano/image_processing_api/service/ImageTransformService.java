@@ -11,15 +11,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class ImageTransformService{
 
-    @Autowired
-    private ImageConversorService conversor;
+
 
     // Mirror the sended image
-    public byte[] mirrorImage(BufferedImage originalIOImage, String format) throws IOException {
+    public BufferedImage mirrorImage(BufferedImage originalIOImage, String format) throws IOException {
         // Create a AffineTransform object with a -1 x scale instance
         AffineTransform transform = AffineTransform.getScaleInstance(-1, 1);
         // Translate the image all your length backwards, to when the scale negative be applied
-        // the length dont be less than 0
+        // the length don't be less than 0
         transform.translate(-originalIOImage.getWidth(), 0);
 
         // Create AffinetransformOp Object with the previus transformation
@@ -28,11 +27,11 @@ public class ImageTransformService{
         BufferedImage newImage = operation.filter(originalIOImage, null);
         
         // return the ResponseEntity with the bytes of the image and MIME type in header
-        return conversor.imageToByteArray(newImage, format);
+        return newImage;
     }
 
     // Apply rescales to the image
-    public byte[] rescaleImage(BufferedImage original, String format, Float scaleX, Float scaleY) throws IOException {
+    public BufferedImage rescaleImage(BufferedImage original, String format, Float scaleX, Float scaleY) throws IOException {
         
         // Create Affine transform object with the given scale values
         AffineTransform transform = AffineTransform.getScaleInstance(scaleX, scaleY);
@@ -45,11 +44,11 @@ public class ImageTransformService{
         BufferedImage newImage = operation.filter(original, null);
 
         // Return the ResponseEntity with the image & MIME header
-        return conversor.imageToByteArray(newImage, format);
+        return newImage;
     }
 
     // apply aa rotation angle () to the image 
-    public byte[] rotateImage(BufferedImage original, Double inclinationInDegrees, String format) throws IOException {
+    public BufferedImage rotateImage(BufferedImage original, Double inclinationInDegrees, String format) throws IOException {
         // save the original x and y image's values
         int x = original.getWidth(), y = original.getHeight();
         // Create a copy of the original image (?)
@@ -72,7 +71,7 @@ public class ImageTransformService{
         BufferedImage newImage = operation.filter(original, null);
 
         // Return the ResponseEntity with image & MIME header
-        return conversor.imageToByteArray(newImage, format);
+        return newImage;
     }
     
 }

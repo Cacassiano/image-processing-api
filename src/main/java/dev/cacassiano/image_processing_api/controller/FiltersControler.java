@@ -1,6 +1,8 @@
 package dev.cacassiano.image_processing_api.controller;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
@@ -29,9 +31,11 @@ public class FiltersControler {
 
     @PostMapping(value = "/black-and-white", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<byte[]> filterBlackAndWhite(@Valid ImageRequestDTO dto) throws IOException {
-        
-        byte[] newImage = service.toBlackAndWhite(ImageIO.read(dto.getImage().getInputStream()), dto.getFormat());
-        return responseService.createImageResponse(newImage, dto.getFormat());
+        InputStream imageInputStream = dto.getImage().getInputStream();
+        BufferedImage image = ImageIO.read(imageInputStream);
+        service.toBlackAndWhite(image, dto.getFormat());
+
+        return responseService.createImageResponse(image, dto.getFormat());
     }
 
     // TODO DTO's separados
@@ -42,9 +46,12 @@ public class FiltersControler {
             @Valid @Min(value = 0l, message="The min value of intesity is 0") @Max(value = 255l, message="The max value of intensity is 255") 
             Integer saturation
         ) throws IOException {
-        
-        byte[] newImage = service.toSepia(ImageIO.read(dto.getImage().getInputStream()), dto.getFormat(), saturation); 
-        return responseService.createImageResponse(newImage, dto.getFormat());
+
+        InputStream imageInputStream = dto.getImage().getInputStream();
+        BufferedImage image = ImageIO.read(imageInputStream);
+
+        service.toSepia(image, dto.getFormat(), saturation);
+        return responseService.createImageResponse(image, dto.getFormat());
     }
 
     /*  Unnimplemented yet
@@ -61,7 +68,8 @@ public class FiltersControler {
     @PostMapping(value = "/remove-background", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<byte[]> removeBackground(@Valid ImageRequestDTO dto) throws IOException {
         
-        byte[] myImage = service.removeBack(dto.getImage());
+        BufferedImage myImage = service.removeBack(dto.getImage());
+
         // Return png because is the unique image type that acepts transparency
         return responseService.createImageResponse(myImage, "png");
     }

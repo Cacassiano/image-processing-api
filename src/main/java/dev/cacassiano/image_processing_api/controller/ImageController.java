@@ -4,6 +4,7 @@ package dev.cacassiano.image_processing_api.controller;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
@@ -43,8 +44,10 @@ public class ImageController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ImageUploadRespDTO> uploadImage(@Valid ImageUploadDTO req) throws IOException {
+        InputStream imageInputStream = req.getImage().getInputStream();
+
         String id = storageService.saveImage(
-                req.getImage().getInputStream(),
+                imageInputStream,
                 req.getFormat(),
                 req.getName()
         );
@@ -52,15 +55,12 @@ public class ImageController {
         return ResponseEntity.ok(new ImageUploadRespDTO(id));
     }
 
-
-
-
     @PostMapping(value = "/mirror/{imgId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<byte[]> mirrorEndpoint(@PathVariable String imgId) throws NotFoundException, IOException {
         Image img = storageService.findImageById(imgId);
         File imgFile = new File("storage/"+img.getUrl());
 
-        byte[] newImage = imageTransformService.mirrorImage(ImageIO.read(imgFile), img.getFormat());
+        BufferedImage newImage = imageTransformService.mirrorImage(ImageIO.read(imgFile), img.getFormat());
         return responseService.createImageResponse(newImage, img.getFormat());
     }
 
@@ -73,9 +73,12 @@ public class ImageController {
             @Valid @NotNull(message="y scale is null")
             Float scaleY
         ) throws IOException{
-        
-        byte[] newImage = imageTransformService.rescaleImage(ImageIO.read(
-            dto.getImage().getInputStream()), 
+
+        InputStream imageInputStream = dto.getImage().getInputStream();
+        BufferedImage image = ImageIO.read(imageInputStream);
+
+        BufferedImage newImage = imageTransformService.rescaleImage(
+            image,
             dto.getFormat(), 
             scaleX, 
             scaleY
@@ -90,9 +93,12 @@ public class ImageController {
             @Valid @NotNull(message="Inclination angle is null") 
             Double inclinationInDegrees
         ) throws IOException {
-        
-        byte[] newImage = imageTransformService.rotateImage(
-            ImageIO.read(dto.getImage().getInputStream()),
+
+        InputStream imageInputStream = dto.getImage().getInputStream();
+        BufferedImage image = ImageIO.read(imageInputStream);
+
+        BufferedImage newImage = imageTransformService.rotateImage(
+            image,
             inclinationInDegrees, 
             dto.getFormat()
         );
@@ -101,8 +107,11 @@ public class ImageController {
 
     @PostMapping(value = "/convert", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<byte[]> convertImage(@Valid ImageRequestDTO dto) throws IOException {
-        byte[] newImage = conversor.convert(
-            ImageIO.read(dto.getImage().getInputStream()), 
+        InputStream imageInputStream = dto.getImage().getInputStream();
+        BufferedImage image = ImageIO.read(imageInputStream);
+
+        BufferedImage newImage = conversor.convert(
+            image,
             dto.getFormat()
         );
         return responseService.createImageResponse(newImage, dto.getFormat());
