@@ -92,11 +92,11 @@ public class ImageController {
 
         if (req.getFilters() != null) {
             Filters filters = req.getFilters();
+            if(filters.remove_background() != null && filters.remove_background()) {
+                image = filtersService.removeBack(conversor.imageToByteArray(image, "png"));
+            }
             if(filters.grayscale() != null && filters.grayscale()) filtersService.toBlackAndWhite(image, filters.black_intesity());
             if(filters.sepia() != null && filters.sepia()) filtersService.toSepia(image, filters.sepia_saturation());
-//            if(filters.remove_background() != null && filters.remove_background()) {
-//                image = filtersService.removeBack(conversor.imageToByteArray(image, "png"));
-//            }
         }
         if (!req.getOutput().equals(imageEntity.getFormat())) {
             image = conversor.convert(image, req.getOutput());
