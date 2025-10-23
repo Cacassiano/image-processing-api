@@ -17,6 +17,8 @@ public class ResponseService {
     public ResponseEntity<byte[]> createImageResponse(BufferedImage image, String format) throws IOException {
         byte[] byteImage = conversor.imageToByteArray(image, format);
 
+        System.out.println("Is png: "+ format.equals("png"));
+        System.out.println("Is jpeg: "+format.equals("jpeg"));
         if (format.equals("png")) {
             return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_PNG)

@@ -27,8 +27,11 @@ public class FiltersService{
     @Value("${remove-bg_API_KEY}")
     private String key;
     
-    public void toBlackAndWhite(BufferedImage image, String format) throws IOException {
+    public void toBlackAndWhite(BufferedImage image, Integer blackIntesity) throws IOException {
         // Iterate over all pixels in the image
+        if(blackIntesity == null) {
+            blackIntesity = 0;
+        }
         for (int i = 0; i< image.getWidth();i++) {
             for (int j = 0; j< image.getHeight(); j++) {
                 // Get the current pixel, as a ABGR color
@@ -39,7 +42,7 @@ public class FiltersService{
                 // Makes a avareage of the color to determine
                 // your brigthness
                 int avg = (pixelRGB.getRed() + pixelRGB.getGreen()+ pixelRGB.getBlue())/3;
-
+                avg = Math.min(Math.max(avg-blackIntesity, 0), 255);
                 // Sets the same value of Red, Green, Blue as the avarege value above
                 // with no saturation the color just can be Black, White e gray
                 int newColor = new Color(avg, avg, avg).getRGB();
@@ -48,10 +51,12 @@ public class FiltersService{
         }
     }
 
-    public void toSepia(BufferedImage image, String format, int saturation) throws IOException {
+    public void toSepia(BufferedImage image, Integer saturation) throws IOException {
         int maxX = image.getWidth(), maxY = image.getHeight();
         final int maxRGB = 255; 
-
+        if(saturation == null) {
+            saturation = 0;
+        }
         // Iterate over all image's pixels
         for(int i = 0; i<maxY;i++) {
             for (int j = 0; j < maxX; j++) {
@@ -104,10 +109,10 @@ public class FiltersService{
         }
     */
 
-    public BufferedImage removeBack(MultipartFile image) throws IOException {
+    public BufferedImage removeBack(byte[] image) throws IOException {
         // Create the multipart entity to send
         HttpEntity entity = MultipartEntityBuilder.create()
-            .addBinaryBody("image_file", image.getBytes())
+            .addBinaryBody("image_file", image)
             .addTextBody("size", "auto")
             .build();
         // Send the request with the multipart entity as payload

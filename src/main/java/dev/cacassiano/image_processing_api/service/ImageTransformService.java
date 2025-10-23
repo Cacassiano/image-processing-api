@@ -5,6 +5,7 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+import dev.cacassiano.image_processing_api.dto.transforms.Crop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +15,7 @@ public class ImageTransformService{
 
 
     // Mirror the sended image
-    public BufferedImage mirrorImage(BufferedImage originalIOImage, String format) throws IOException {
+    public BufferedImage mirrorImage(BufferedImage originalIOImage) throws IOException {
         // Create a AffineTransform object with a -1 x scale instance
         AffineTransform transform = AffineTransform.getScaleInstance(-1, 1);
         // Translate the image all your length backwards, to when the scale negative be applied
@@ -31,7 +32,7 @@ public class ImageTransformService{
     }
 
     // Apply rescales to the image
-    public BufferedImage rescaleImage(BufferedImage original, String format, Float scaleX, Float scaleY) throws IOException {
+    public BufferedImage rescaleImage(BufferedImage original, Float scaleX, Float scaleY) throws IOException {
         
         // Create Affine transform object with the given scale values
         AffineTransform transform = AffineTransform.getScaleInstance(scaleX, scaleY);
@@ -48,7 +49,7 @@ public class ImageTransformService{
     }
 
     // apply aa rotation angle () to the image 
-    public BufferedImage rotateImage(BufferedImage original, Double inclinationInDegrees, String format) throws IOException {
+    public BufferedImage rotateImage(BufferedImage original, Double inclinationInDegrees) throws IOException {
         // save the original x and y image's values
         int x = original.getWidth(), y = original.getHeight();
         // Create a copy of the original image (?)
@@ -73,5 +74,13 @@ public class ImageTransformService{
         // Return the ResponseEntity with image & MIME header
         return newImage;
     }
-    
+
+    public BufferedImage cropImage(BufferedImage image, Crop crop) {
+        return image.getSubimage(
+            Math.max(Math.min(crop.xini(), image.getWidth()-1), 0),
+            Math.max(Math.min(crop.yini(), image.getHeight()-1), 0),
+            Math.max(Math.min(crop.xfin() - crop.xini(), image.getWidth()-1), 0),
+            Math.max(Math.min(crop.yfin() - crop.yini(), image.getHeight()-1), 0)
+        );
+    }
 }

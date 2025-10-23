@@ -46,7 +46,7 @@ public class ImageStorageServiceImpl implements ImageStorageService {
             if(!imageFile.exists()) throw new IOException("Error while saving the file");
 
             // create the image entity
-            Image image = new Image(id+"."+format, format, name);
+            Image image = new Image("storage/"+id+"."+format, format, name);
             // try save in db
             image = repository.save(image);
 

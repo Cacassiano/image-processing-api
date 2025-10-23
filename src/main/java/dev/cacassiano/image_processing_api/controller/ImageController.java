@@ -10,23 +10,22 @@ import javax.imageio.ImageIO;
 
 import dev.cacassiano.image_processing_api.dto.ImageUploadDTO;
 import dev.cacassiano.image_processing_api.dto.ImageUploadRespDTO;
+import dev.cacassiano.image_processing_api.dto.TransformDTO;
+import dev.cacassiano.image_processing_api.dto.transforms.Filters;
 import dev.cacassiano.image_processing_api.entity.Image;
 import dev.cacassiano.image_processing_api.exceptions.custom.NotFoundException;
+import dev.cacassiano.image_processing_api.service.FiltersService;
 import dev.cacassiano.image_processing_api.service.ImageConversorService;
 import dev.cacassiano.image_processing_api.service.interfaces.ImageStorageService;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import dev.cacassiano.image_processing_api.dto.ImageRequestDTO;
 import dev.cacassiano.image_processing_api.service.ImageTransformService;
 import dev.cacassiano.image_processing_api.service.ResponseService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 
 @RestController
 @RequestMapping("/images")
@@ -41,6 +40,8 @@ public class ImageController {
     private ResponseService responseService;
     @Autowired
     private ImageStorageService storageService;
+    @Autowired
+    private FiltersService filtersService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ImageUploadRespDTO> uploadImage(@Valid ImageUploadDTO req) throws IOException {
@@ -55,65 +56,52 @@ public class ImageController {
         return ResponseEntity.ok(new ImageUploadRespDTO(id));
     }
 
-    @PostMapping(value = "/mirror/{imgId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<byte[]> mirrorEndpoint(@PathVariable String imgId) throws NotFoundException, IOException {
-        Image img = storageService.findImageById(imgId);
-        File imgFile = new File("storage/"+img.getUrl());
+    @PostMapping("/{image_id}/transform")
+    public ResponseEntity<byte[]> transformImage(
+            @RequestBody
+            TransformDTO req,
+            @PathVariable @NotBlank
+            String image_id
+            ) throws IOException, NotFoundException {
+        Image imageEntity = storageService.findImageById(image_id);
+        BufferedImage image = ImageIO.read(new File(imageEntity.getUrl()));
 
-        BufferedImage newImage = imageTransformService.mirrorImage(ImageIO.read(imgFile), img.getFormat());
-        return responseService.createImageResponse(newImage, img.getFormat());
-    }
+        if(req.getCrop() != null){
+            image = imageTransformService.cropImage(
+                image,
+                req.getCrop()
+            );
+        }
 
-    @PostMapping(value = "/scale", consumes = MediaType.MULTIPART_FORM_DATA_VALUE) 
-    public ResponseEntity<byte[]> scaleImage(
-            @Valid 
-            ImageRequestDTO dto,
-            @Valid @NotNull(message="x scale is null") 
-            Float scaleX, 
-            @Valid @NotNull(message="y scale is null")
-            Float scaleY
-        ) throws IOException{
+        if (req.getRescale() != null) {
+            image = imageTransformService.rescaleImage(
+                    image,
+                    req.getRescale().xscale(),
+                    req.getRescale().yscale()
+            );
+        }
+        if (req.getMirror() != null && req.getMirror()) {
+            image = imageTransformService.mirrorImage(image);
+        }
+        if (req.getRotation() != null) {
+            image = imageTransformService.rotateImage(
+                image,
+                req.getRotation()
+            );
+        }
 
-        InputStream imageInputStream = dto.getImage().getInputStream();
-        BufferedImage image = ImageIO.read(imageInputStream);
-
-        BufferedImage newImage = imageTransformService.rescaleImage(
-            image,
-            dto.getFormat(), 
-            scaleX, 
-            scaleY
-        );
-        return responseService.createImageResponse(newImage, dto.getFormat());
-    }
-
-    @PostMapping(value = "/rotate", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<byte[]> rotateImage(
-            @Valid 
-            ImageRequestDTO dto,
-            @Valid @NotNull(message="Inclination angle is null") 
-            Double inclinationInDegrees
-        ) throws IOException {
-
-        InputStream imageInputStream = dto.getImage().getInputStream();
-        BufferedImage image = ImageIO.read(imageInputStream);
-
-        BufferedImage newImage = imageTransformService.rotateImage(
-            image,
-            inclinationInDegrees, 
-            dto.getFormat()
-        );
-        return responseService.createImageResponse(newImage, dto.getFormat());
-    }
-
-    @PostMapping(value = "/convert", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<byte[]> convertImage(@Valid ImageRequestDTO dto) throws IOException {
-        InputStream imageInputStream = dto.getImage().getInputStream();
-        BufferedImage image = ImageIO.read(imageInputStream);
-
-        BufferedImage newImage = conversor.convert(
-            image,
-            dto.getFormat()
-        );
-        return responseService.createImageResponse(newImage, dto.getFormat());
+        if (req.getFilters() != null) {
+            Filters filters = req.getFilters();
+            if(filters.grayscale() != null && filters.grayscale()) filtersService.toBlackAndWhite(image, filters.black_intesity());
+            if(filters.sepia() != null && filters.sepia()) filtersService.toSepia(image, filters.sepia_saturation());
+//            if(filters.remove_background() != null && filters.remove_background()) {
+//                image = filtersService.removeBack(conversor.imageToByteArray(image, "png"));
+//            }
+        }
+        if (!req.getOutput().equals(imageEntity.getFormat())) {
+            image = conversor.convert(image, req.getOutput());
+        }
+        System.out.println("Enviando response");
+        return responseService.createImageResponse(image, req.getOutput());
     }
 }
