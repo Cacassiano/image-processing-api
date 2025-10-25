@@ -49,7 +49,7 @@ Além disso, a API pode se integrar a serviços externos, como o **Remove.bg**, 
 1. Clone o repositório:
 
    ```bash
-   git clone https://github.com/seuusuario/image-processing-api.git
+   git clone https://github.com/Cacassiano/image-processing-api.git
    cd image-processing-api
    ```
 
@@ -72,7 +72,7 @@ Além disso, a API pode se integrar a serviços externos, como o **Remove.bg**, 
 1. Clone o repositório:
 
    ```bash
-   git clone https://github.com/seuusuario/image-processing-api.git
+   git clone https://github.com/Cacassiano/image-processing-api.git
    cd image-processing-api
    ```
 
@@ -232,7 +232,3 @@ Authorization: Bearer <token>
 
 **Response:**
 Retorna a imagem original armazenada no servidor.
-
----
-
-Deseja que eu adicione também um exemplo completo de **Dockerfile otimizado** (com `multi-stage build`) para incluir no repositório junto com este README? Isso ajudaria a documentar a parte de build e runtime de forma mais completa.
