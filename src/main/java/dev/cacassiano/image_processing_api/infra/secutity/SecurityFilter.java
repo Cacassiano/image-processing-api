@@ -32,18 +32,20 @@ public class SecurityFilter extends OncePerRequestFilter{
         String token = this.getToken(request);
         if(token != null) {
             String login = service.validateToken(token);
+
             User user = repository.findByEmail(login).orElseThrow(() -> new RuntimeException("erro ao procurar user"));
             List<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null,authorities);
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
+        System.out.println("Doing filter");
         filterChain.doFilter(request, response);
     }
 
     private String getToken(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
-        if (header == null || header.equals("")) {return null;}
-        else{ return header.replace("Bearer ", ""); }
+        if (header == null || header.isEmpty()) return null;
+        else return header.replace("Bearer ", "");
     }
     
 }

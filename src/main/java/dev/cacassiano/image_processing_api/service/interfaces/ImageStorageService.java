@@ -8,6 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public interface ImageStorageService {
-    public String saveImage(InputStream imageInputStream, String format, String name) throws IOException;
-    public Image findImageById(String id)throws NotFoundException, IOException;
+    public String saveImage(InputStream imageInputStream, String format, String name, String userToken) throws IOException, NotFoundException;
+    public Image findImageById(String id, String userToken)throws NotFoundException, IOException;
 }

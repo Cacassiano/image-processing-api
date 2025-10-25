@@ -44,13 +44,17 @@ public class ImageController {
     private FiltersService filtersService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ImageUploadRespDTO> uploadImage(@Valid ImageUploadDTO req) throws IOException {
+    public ResponseEntity<ImageUploadRespDTO> uploadImage(
+            @Valid ImageUploadDTO req,
+            @RequestHeader("Authorization") String token
+    ) throws IOException, NotFoundException {
         InputStream imageInputStream = req.getImage().getInputStream();
 
         String id = storageService.saveImage(
                 imageInputStream,
                 req.getFormat(),
-                req.getName()
+                req.getName(),
+                token
         );
 
         return ResponseEntity.ok(new ImageUploadRespDTO(id));
@@ -61,9 +65,11 @@ public class ImageController {
             @RequestBody
             TransformDTO req,
             @PathVariable @NotBlank
-            String image_id
+            String image_id,
+            @RequestHeader("Authorization")
+            String token
             ) throws IOException, NotFoundException {
-        Image imageEntity = storageService.findImageById(image_id);
+        Image imageEntity = storageService.findImageById(image_id, token);
         BufferedImage image = ImageIO.read(new File(imageEntity.getUrl()));
 
         if(req.getCrop() != null){

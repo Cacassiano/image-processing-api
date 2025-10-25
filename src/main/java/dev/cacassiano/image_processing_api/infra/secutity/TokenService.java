@@ -33,7 +33,7 @@ public class TokenService {
 
     public String validateToken(String token){
         try {
-            Algorithm cripto = Algorithm.HMAC256(secretKey); 
+            Algorithm cripto = Algorithm.HMAC256(secretKey);
             return JWT.require(cripto)
                     .withIssuer(issuer)
                     .build()
