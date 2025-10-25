@@ -110,4 +110,14 @@ public class ImageController {
         System.out.println("Enviando response");
         return responseService.createImageResponse(image, req.getOutput());
     }
+
+    @GetMapping("/{image_id}")
+    public ResponseEntity<byte[]> getImageById(
+            @PathVariable String image_id,
+            @RequestHeader("Authorization") String token
+    ) throws NotFoundException, IOException {
+        Image imageEntity = storageService.findImageById(image_id, token);
+        BufferedImage image = ImageIO.read(new File(imageEntity.getUrl()));
+        return responseService.createImageResponse(image, imageEntity.getFormat());
+    }
 }

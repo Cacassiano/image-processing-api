@@ -22,6 +22,7 @@ public class GlobalExcetionHandler {
 
     @ExceptionHandler(HandlerMethodValidationException.class)
     public ResponseEntity<ValidationExceptionDTO> validationExeptionHandler(HandlerMethodValidationException ex) {
+        System.out.println(ex);
         ValidationExceptionDTO response = new ValidationExceptionDTO(
             "Invalid arguments in the request",
             ex.getAllErrors()
@@ -34,6 +35,7 @@ public class GlobalExcetionHandler {
 
     @ExceptionHandler(SupportedTypesException.class)
     public ResponseEntity<Map<String, String>> supportedTypesHandler(SupportedTypesException ex) {
+        System.out.println(ex);
         Map<String, String> response = new HashMap<>();
         response.put("error", "Invalid arguments in the request");
         response.put("message", ex.getMessage());
@@ -42,6 +44,7 @@ public class GlobalExcetionHandler {
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public ResponseEntity<Map<String, String>> mediaNotSupportedHandler(HttpMediaTypeNotSupportedException ex) {
+        System.out.println(ex);
         Map<String, String> response = new HashMap<>();
         response.put("error", ex.getMessage());
         response.put("message", ex.getContentType()+" is not supported");
@@ -50,6 +53,7 @@ public class GlobalExcetionHandler {
 
     @ExceptionHandler(IOException.class)
     public ResponseEntity<Map<String, String>> ioExceptionHandler(IOException ex){
+        System.out.println(ex);
         Map<String, String> response = new HashMap<>();
         response.put("message", ex.getMessage());
         return ResponseEntity.unprocessableEntity().body(response);
@@ -57,6 +61,7 @@ public class GlobalExcetionHandler {
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<Map<String, String>> notFoundException(NotFoundException ex) {
+        System.out.println(ex);
         Map<String, String> response = new HashMap<>();
         response.put("messsage", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
@@ -65,6 +70,7 @@ public class GlobalExcetionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> exceptionHandler(Exception ex) {
+        System.out.println(ex);
         Map<String, String> response = new HashMap<>();
         response.put("message", ex.getMessage());
 
